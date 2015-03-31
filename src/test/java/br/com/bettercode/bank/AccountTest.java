@@ -1,12 +1,14 @@
 package br.com.bettercode.bank;
 
-import org.junit.Test;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.junit.Test;
+
+import br.com.bettercode.bank.time.BankTime;
 
 public class AccountTest {
 
@@ -84,7 +86,7 @@ public class AccountTest {
 	public void getStatement_shouldReturnEmptyStatement(){
 		Account account = new Account();
 
-		List statement = account.getStatement();
+		Statement statement = account.getStatement();
 
 		assertTrue(statement.isEmpty());
 	}
@@ -95,9 +97,26 @@ public class AccountTest {
 		account.deposit(new BigDecimal("100"));
 		account.withdraw(BigDecimal.TEN);
 
-		List statement = account.getStatement();
+		Statement statement = account.getStatement();
 
 		assertEquals(2, statement.size());
+	}
+	
+	@Test
+	public void getStatement_shouldNotReturnEntriesBeforeLastWeek() {
+		LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
+
+		Account account = new Account();
+
+		BankTime.useFixedClockAt(twoWeeksAgo);
+		account.deposit(new BigDecimal("100"));
+		
+		BankTime.useSystemDefaultZoneClock();
+		account.withdraw(BigDecimal.TEN);
+
+		Statement statement = account.getStatement();
+
+		assertEquals(1, statement.size());
 	}
 
 }

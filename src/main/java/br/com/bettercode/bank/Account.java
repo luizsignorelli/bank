@@ -1,19 +1,17 @@
 package br.com.bettercode.bank;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Account {
 
 	private BigDecimal limit;
 	private BigDecimal balance;
-	private List statement;
+	private Statement statement;
 
 	public Account() {
 		balance = BigDecimal.ZERO;
 		limit = BigDecimal.ZERO;
-		statement = new ArrayList();
+		statement = new Statement();
 	}
 
 	public Account(BigDecimal limit) {
@@ -22,6 +20,7 @@ public class Account {
 	}
 
 	public void deposit(BigDecimal depositValue) {
+		statement.add(new AccountEntry());
 		balance = balance.add(depositValue);
 	}
 
@@ -33,11 +32,11 @@ public class Account {
 		if(balance.add(limit).compareTo(withdrawValue) < 0) {
 			throw new AccountLimitException();
 		}
-
+		statement.add(new AccountEntry());
 		balance = balance.subtract(withdrawValue);
 	}
 
-	public List getStatement() {
+	public Statement getStatement() {
 		return statement;
 	}
 }
